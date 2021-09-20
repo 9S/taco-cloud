@@ -1,6 +1,7 @@
 package com.example.tacocloud.orders;
 
 import com.example.tacocloud.Taco;
+import com.example.tacocloud.user.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -63,6 +64,9 @@ public class Order implements Serializable {
     void placedAt() {
         this.placedAt = new Date();
     }
+
+    @ManyToOne
+    private User user;
 
     public void addDesign(Taco saved) {
         tacos.add(saved);

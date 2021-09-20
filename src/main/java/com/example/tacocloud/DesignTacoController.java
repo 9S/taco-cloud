@@ -2,13 +2,18 @@ package com.example.tacocloud;
 
 import com.example.tacocloud.Ingredient.Type;
 import com.example.tacocloud.orders.Order;
+import com.example.tacocloud.orders.OrderRepository;
+import com.example.tacocloud.user.User;
+import com.example.tacocloud.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,12 +25,16 @@ import java.util.stream.Collectors;
 public class DesignTacoController {
     private final IngredientRepository ingredientRepository;
     private final TacoRepository designRepo;
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
 
     private final ArrayList<Ingredient> ingredients;
 
-    public DesignTacoController(IngredientRepository ingredientRepository, TacoRepository designRepo) {
+    public DesignTacoController(IngredientRepository ingredientRepository, TacoRepository designRepo, OrderRepository orderRepository, UserRepository userRepository) {
         this.ingredientRepository = ingredientRepository;
         this.designRepo = designRepo;
+        this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
         ingredients = new ArrayList<>();
         ingredientRepository.findAll().forEach(ingredients::add);
     }
@@ -43,7 +52,10 @@ public class DesignTacoController {
     }
 
     @PostMapping
-    public String processDesign(Model model, @Valid Taco taco, @ModelAttribute Order order, Errors errors) {
+    public String processDesign(Model model,
+                                @Valid Taco taco,
+                                @ModelAttribute Order order,
+                                Errors errors) {
         if (errors.hasErrors()) {
             Type[] types = Type.values();
             for (Type type : types) {
@@ -53,8 +65,8 @@ public class DesignTacoController {
             return "design";
         }
 
-        var saved = designRepo.save(taco);
-        order.addDesign(saved);
+        var newTaco = designRepo.save(taco);
+        order.addDesign(newTaco);
         log.info("Processing design: {}", taco);
         return "redirect:/orders/current";
     }
