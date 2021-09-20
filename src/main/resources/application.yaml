@@ -1,0 +1,66 @@
+debug: true
+spring:
+    profiles:
+        active: POSTGRES
+    #datasource:
+    #    driver-class-name: org.h2.Driver
+    #h2:
+    #    console:
+    #        enabled: true
+    #jpa:
+    #    database-platform: org.hibernate.dialect.H2Dialect
+    #    show-sql: true
+    #ldap:
+    #    embedded:
+    #        base-dn: dc=tacocloud,dc=com
+    #        ldif: '"C:\Users\sprinm\IdeaProjects\taco-cloud\src\main\resources\users.ldif"'
+    #        port: 8389
+    sql:
+        init:
+            mode: always
+    thymeleaf:
+        cache: false
+server:
+    port: 8443
+    ssl:
+        key-store: classpath:tacokey.p12
+        key-store-password: 123456
+        key-password: 123456
+taco:
+    orders:
+        page_size: 20
+
+---
+spring:
+    config:
+        activate:
+            on-profile: POSTGRES
+    jpa:
+        hibernate:
+            ddl-auto: none
+    datasource:
+        url: jdbc:postgresql:postgres
+        password: 123456
+        username: postgres
+
+---
+spring:
+    config:
+        activate:
+            on-profile: RUN
+    jpa:
+        hibernate:
+            ddl-auto: none
+    datasource:
+      url: jdbc:h2:~/database
+
+---
+spring:
+    config:
+        activate:
+            on-profile: TEST
+    jpa:
+        hibernate:
+            ddl-auto: create
+    datasource:
+      url: jdbc:h2:mem:testdb
